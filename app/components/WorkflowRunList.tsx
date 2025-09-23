@@ -152,7 +152,7 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
             
             {isExpanded && (
               <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
-                <ArtifactsList owner={owner} repo={repo} runId={run.id} />
+                <ArtifactsList owner={owner} repo={repo} runId={run.id} commitSha={run.head_sha} />
               </div>
             )}
           </div>

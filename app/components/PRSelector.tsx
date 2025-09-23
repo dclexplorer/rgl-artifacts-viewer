@@ -50,25 +50,25 @@ export default function PRSelector({
       : 'All workflow runs'
 
   return (
-    <div className="relative mb-6">
-      <label className="block text-sm font-medium mb-2">
-        Filter by Pull Request or Branch
+    <div className="relative">
+      <label className="block text-sm font-medium mb-3 text-gray-700 dark:text-gray-300">
+        Pull Request or Branch
       </label>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex-1 px-3 py-2 border rounded-md flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 ${
+          className={`flex-1 min-w-0 px-3 py-2 border rounded-md flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 ${
             selectedBranch === 'main' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-700'
           }`}
         >
-          <span className="flex items-center gap-2 truncate">
-            {selectedPR && <GitPullRequest className="w-4 h-4" />}
+          <span className="flex items-center gap-2 min-w-0 flex-1">
+            {selectedPR && <GitPullRequest className="w-4 h-4 flex-shrink-0" />}
             <span className="truncate">{displayValue}</span>
             {selectedBranch === 'main' && (
-              <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">MAIN</span>
+              <span className="text-xs bg-green-500 text-white px-2 py-1 rounded flex-shrink-0 ml-2">MAIN</span>
             )}
           </span>
-          <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
         
         {selectedPR && (
@@ -76,7 +76,7 @@ export default function PRSelector({
             href={selectedPR.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center gap-2 font-medium shadow-sm whitespace-nowrap flex-shrink-0"
             title="Open PR on GitHub"
           >
             <ExternalLink className="w-4 h-4" />

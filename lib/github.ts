@@ -5,7 +5,8 @@ interface GitHubRepository {
 }
 
 export const REPOSITORIES: GitHubRepository[] = [
-  { owner: 'decentraland', repo: 'godot-explorer', displayName: 'Godot Explorer' }
+  { owner: 'decentraland', repo: 'godot-explorer', displayName: 'Godot Explorer' },
+  { owner: 'decentraland', repo: 'bevy-explorer', displayName: 'Bevy Explorer' }
 ]
 
 export interface WorkflowRun {

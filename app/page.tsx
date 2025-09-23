@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { RefreshCw, GitBranch, Package, GitPullRequest } from 'lucide-react'
-import ProjectSelector from './components/ProjectSelector'
+import ProjectTabs from './components/ProjectTabs'
 import PRSelector from './components/PRSelector'
 import WorkflowRunList from './components/WorkflowRunList'
 import { REPOSITORIES } from '@/lib/github'
@@ -63,11 +63,11 @@ export default function Home() {
         </header>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <ProjectSelector
-              selected={selectedProject}
-              onSelect={handleProjectChange}
-            />
+          <ProjectTabs
+            selected={selectedProject}
+            onSelect={handleProjectChange}
+          />
+          <div className="mt-6">
             <PRSelector
               selectedPR={selectedPR}
               selectedBranch={selectedBranch}
