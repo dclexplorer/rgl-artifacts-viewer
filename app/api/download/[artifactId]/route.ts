@@ -3,13 +3,14 @@ import { getArtifactDownloadUrl } from '@/lib/github'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { artifactId: string } }
+  { params }: { params: Promise<{ artifactId: string }> }
 ) {
   try {
     const searchParams = request.nextUrl.searchParams
     const owner = searchParams.get('owner') || 'decentraland'
     const repo = searchParams.get('repo') || 'godot-explorer'
-    const artifactId = parseInt(params.artifactId)
+    const { artifactId: artifactIdStr } = await params
+    const artifactId = parseInt(artifactIdStr)
     
     if (isNaN(artifactId)) {
       return NextResponse.json(

@@ -3,13 +3,14 @@ import { fetchArtifacts } from '@/lib/github'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { runId: string } }
+  { params }: { params: Promise<{ runId: string }> }
 ) {
   try {
     const searchParams = request.nextUrl.searchParams
     const owner = searchParams.get('owner') || 'decentraland'
     const repo = searchParams.get('repo') || 'godot-explorer'
-    const runId = parseInt(params.runId)
+    const { runId: runIdStr } = await params
+    const runId = parseInt(runIdStr)
     
     if (isNaN(runId)) {
       return NextResponse.json(
