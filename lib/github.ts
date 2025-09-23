@@ -25,6 +25,32 @@ export interface WorkflowRun {
   repository: {
     full_name: string
   }
+  pull_requests?: Array<{
+    number: number
+    url: string
+  }>
+}
+
+export interface PullRequest {
+  id: number
+  number: number
+  title: string
+  state: string
+  html_url: string
+  user: {
+    login: string
+    avatar_url: string
+  }
+  created_at: string
+  updated_at: string
+  head: {
+    ref: string
+    sha: string
+  }
+  base: {
+    ref: string
+  }
+  draft: boolean
 }
 
 export interface Artifact {
@@ -176,4 +202,28 @@ export async function fetchBranches(owner: string, repo: string) {
   
   const branches = await response.json()
   return branches.map((b: any) => b.name) as string[]
+}
+
+export async function fetchOpenPullRequests(
+  owner: string,
+  repo: string
+): Promise<PullRequest[]> {
+  const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls?state=open&per_page=100`
+  
+  const headers: HeadersInit = {
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  }
+  
+  if (GITHUB_TOKEN) {
+    headers['Authorization'] = `Bearer ${GITHUB_TOKEN}`
+  }
+  
+  const response = await fetch(url, { headers })
+  
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`)
+  }
+  
+  return await response.json() as PullRequest[]
 }

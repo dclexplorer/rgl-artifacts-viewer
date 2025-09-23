@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { CheckCircle, XCircle, Clock, PlayCircle, AlertCircle, Download } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, PlayCircle, AlertCircle, Download, GitPullRequest, ExternalLink } from 'lucide-react'
 import type { WorkflowRun } from '@/lib/github'
 import ArtifactsList from './ArtifactsList'
 
@@ -73,14 +73,14 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
   return (
     <div className="space-y-4">
       {runs.map((run) => {
-        const isProduction = run.head_branch === 'main'
+        const isMain = run.head_branch === 'main'
         const isExpanded = expandedRun === run.id
         
         return (
           <div
             key={run.id}
             className={`border rounded-lg overflow-hidden ${
-              isProduction 
+              isMain 
                 ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10' 
                 : 'border-gray-200 dark:border-gray-700'
             }`}
@@ -95,12 +95,34 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
                   <div>
                     <h3 className="font-semibold text-lg flex items-center gap-2">
                       {run.display_title || run.name}
-                      {isProduction && (
-                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">PRODUCTION</span>
+                      {isMain && (
+                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">MAIN</span>
                       )}
                     </h3>
                     <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                       <span className="font-medium">{run.head_branch}</span>
+                      {run.pull_requests && run.pull_requests.length > 0 && (
+                        <>
+                          <span className="mx-2">•</span>
+                          <span className="inline-flex items-center gap-1">
+                            <GitPullRequest className="w-3 h-3" />
+                            {run.pull_requests.map((pr, index) => (
+                              <span key={pr.number}>
+                                {index > 0 && ', '}
+                                <a 
+                                  href={pr.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  #{pr.number}
+                                </a>
+                              </span>
+                            ))}
+                          </span>
+                        </>
+                      )}
                       <span className="mx-2">•</span>
                       <span>#{run.run_number}</span>
                       <span className="mx-2">•</span>

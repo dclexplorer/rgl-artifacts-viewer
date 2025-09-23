@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { RefreshCw, GitBranch, Package } from 'lucide-react'
+import { RefreshCw, GitBranch, Package, GitPullRequest } from 'lucide-react'
 import ProjectSelector from './components/ProjectSelector'
-import BranchSelector from './components/BranchSelector'
+import PRSelector from './components/PRSelector'
 import WorkflowRunList from './components/WorkflowRunList'
 import { REPOSITORIES } from '@/lib/github'
+import type { PullRequest } from '@/lib/github'
 
 export default function Home() {
   const [selectedProject, setSelectedProject] = useState({
@@ -13,11 +14,13 @@ export default function Home() {
     repo: REPOSITORIES[0].repo
   })
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
+  const [selectedPR, setSelectedPR] = useState<PullRequest | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleProjectChange = (owner: string, repo: string) => {
     setSelectedProject({ owner, repo })
     setSelectedBranch(null)
+    setSelectedPR(null)
   }
 
   const handleRefresh = () => {
@@ -65,9 +68,11 @@ export default function Home() {
               selected={selectedProject}
               onSelect={handleProjectChange}
             />
-            <BranchSelector
+            <PRSelector
+              selectedPR={selectedPR}
               selectedBranch={selectedBranch}
-              onSelect={setSelectedBranch}
+              onSelectPR={setSelectedPR}
+              onSelectBranch={setSelectedBranch}
               owner={selectedProject.owner}
               repo={selectedProject.repo}
             />
@@ -75,19 +80,24 @@ export default function Home() {
           
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="flex items-start gap-2">
-              <GitBranch className="w-4 h-4 text-blue-500 mt-0.5" />
+              {selectedPR ? <GitPullRequest className="w-4 h-4 text-blue-500 mt-0.5" /> : <GitBranch className="w-4 h-4 text-blue-500 mt-0.5" />}
               <div className="text-sm">
                 <p className="text-blue-900 dark:text-blue-100">
                   Currently viewing: <strong>{currentRepo?.displayName}</strong>
-                  {selectedBranch && (
+                  {selectedPR && (
+                    <>
+                      {' '}• PR #{selectedPR.number}: <strong>{selectedPR.title}</strong>
+                    </>
+                  )}
+                  {!selectedPR && selectedBranch && (
                     <>
                       {' '}• Branch: <strong>{selectedBranch}</strong>
                       {selectedBranch === 'main' && (
-                        <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded">PRODUCTION</span>
+                        <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded">MAIN</span>
                       )}
                     </>
                   )}
-                  {!selectedBranch && ' • All branches'}
+                  {!selectedPR && !selectedBranch && ' • All workflow runs'}
                 </p>
               </div>
             </div>

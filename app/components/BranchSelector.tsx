@@ -33,7 +33,7 @@ export default function BranchSelector({ selectedBranch, onSelect, owner, repo }
   }
 
   const displayValue = selectedBranch || 'All branches'
-  const isProduction = selectedBranch === 'main'
+  const isMain = selectedBranch === 'main'
 
   return (
     <div className="relative mb-6">
@@ -43,13 +43,13 @@ export default function BranchSelector({ selectedBranch, onSelect, owner, repo }
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full px-3 py-2 border rounded-md flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 ${
-          isProduction ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-700'
+          isMain ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-700'
         }`}
       >
         <span className="flex items-center gap-2">
           {displayValue}
-          {isProduction && (
-            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">PRODUCTION</span>
+          {isMain && (
+            <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">MAIN</span>
           )}
         </span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -79,7 +79,7 @@ export default function BranchSelector({ selectedBranch, onSelect, owner, repo }
             >
               <span>{branch}</span>
               {branch === 'main' && (
-                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">PRODUCTION</span>
+                <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">MAIN</span>
               )}
             </button>
           ))}

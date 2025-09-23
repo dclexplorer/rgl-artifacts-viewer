@@ -5,7 +5,9 @@ A Vercel app for viewing and downloading GitHub Actions artifacts from Decentral
 ## Features
 
 - 📦 View workflow runs and their artifacts
-- 🌿 Filter by branch (with production/main highlight)
+- 🔀 Filter by open Pull Requests or branches
+- 🔗 Direct links to view PRs on GitHub
+- 🌿 Main branch highlighted separately
 - 📅 Shows builds from the last 30 days
 - ⬇️ Direct download links for artifacts
 - 🔄 Real-time status updates
@@ -118,10 +120,12 @@ export const REPOSITORIES: GitHubRepository[] = [
 
 ## Features Details
 
-### Branch Filtering
-- Filter by specific branch or view all branches
-- "main" branch highlighted as PRODUCTION
-- Persistent selection across sessions
+### Pull Request & Branch Filtering
+- Filter by open Pull Requests to see PR-specific builds
+- Direct links to view PRs on GitHub
+- Filter by specific branch or view all workflow runs
+- "main" branch highlighted with special MAIN badge
+- Shows PR numbers in workflow run listings when applicable
 
 ### Artifact Management
 - View all artifacts from workflow runs
@@ -137,4 +141,5 @@ export const REPOSITORIES: GitHubRepository[] = [
 ## License
 
 MIT# rgl-artifacts-viewer
+# rgl-artifacts-viewer
 # rgl-artifacts-viewer
