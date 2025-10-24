@@ -5,6 +5,7 @@ import { RefreshCw, GitBranch, Package, GitPullRequest } from 'lucide-react'
 import ProjectTabs from './components/ProjectTabs'
 import PRSelector from './components/PRSelector'
 import WorkflowRunList from './components/WorkflowRunList'
+import GitHubTokenWarning from './components/GitHubTokenWarning'
 import { REPOSITORIES } from '@/lib/github'
 import type { PullRequest } from '@/lib/github'
 
@@ -53,13 +54,7 @@ export default function Home() {
           <p className="text-gray-600 dark:text-gray-400">
             View and download GitHub Actions artifacts from your builds. Showing builds from the last 30 days.
           </p>
-          {!process.env.NEXT_PUBLIC_HAS_TOKEN && (
-            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                <strong>Note:</strong> GitHub token required for downloads. See README for setup instructions.
-              </p>
-            </div>
-          )}
+          <GitHubTokenWarning />
         </header>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
