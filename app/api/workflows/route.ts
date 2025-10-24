@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWorkflowRuns } from '@/lib/github'
+import { fetchWorkflowRuns, EXCLUDED_WORKFLOWS } from '@/lib/github'
+
+function shouldExcludeWorkflow(workflowName: string): boolean {
+  const lowerName = workflowName.toLowerCase()
+  return EXCLUDED_WORKFLOWS.some(excluded =>
+    lowerName.includes(excluded.toLowerCase())
+  )
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,9 +15,14 @@ export async function GET(request: NextRequest) {
     const repo = searchParams.get('repo') || 'godot-explorer'
     const branch = searchParams.get('branch') || undefined
     const page = parseInt(searchParams.get('page') || '1')
-    
-    const workflows = await fetchWorkflowRuns(owner, repo, branch, page)
-    
+
+    const allWorkflows = await fetchWorkflowRuns(owner, repo, branch, page)
+
+    // Filter out excluded workflows
+    const workflows = allWorkflows.filter(workflow =>
+      !shouldExcludeWorkflow(workflow.name)
+    )
+
     return NextResponse.json({ workflows }, {
       headers: {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120'

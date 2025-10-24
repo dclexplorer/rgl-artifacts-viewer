@@ -9,6 +9,11 @@ export const REPOSITORIES: GitHubRepository[] = [
   { owner: 'decentraland', repo: 'bevy-explorer', displayName: 'Bevy Explorer' }
 ]
 
+// Workflow names to exclude from the list (case-insensitive partial match)
+export const EXCLUDED_WORKFLOWS = [
+  'sync branch deletion'
+]
+
 export interface WorkflowRun {
   id: number
   name: string

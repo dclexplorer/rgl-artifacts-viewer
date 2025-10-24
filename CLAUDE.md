@@ -71,6 +71,17 @@ export const REPOSITORIES: GitHubRepository[] = [
 ]
 ```
 
+### Filtering Workflows
+To hide certain workflows from the list (e.g., maintenance workflows like branch deletion), edit `/lib/github.ts`:
+```typescript
+export const EXCLUDED_WORKFLOWS = [
+  'sync branch deletion',  // Case-insensitive partial match
+  // Add more patterns here (will match any workflow name containing these strings)
+]
+```
+
+The filter performs case-insensitive partial matching on workflow names. For example, `'sync branch deletion'` will match "🗑️ Sync Branch Deletion".
+
 ### Environment Variables
 - `GITHUB_TOKEN`: Personal Access Token (required for downloads)
   - Public repos: `public_repo` scope
