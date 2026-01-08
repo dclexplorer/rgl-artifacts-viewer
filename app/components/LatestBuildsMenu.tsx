@@ -62,18 +62,23 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
       branches.map(async (branch) => {
         const existingBuild = builds.find(b => b.branch === branch)!
         try {
-          // Fetch latest workflow run
+          // Fetch latest workflow runs
           const workflowUrl = `/api/workflows?owner=${owner}&repo=${repo}&branch=${branch}&page=1`
           const workflowResponse = await fetch(workflowUrl)
           const workflowData = await workflowResponse.json()
-          const workflows = workflowData.workflows || []
+          const workflows: WorkflowRun[] = workflowData.workflows || []
           const latestRun = workflows.length > 0 ? workflows[0] : null
 
-          // Fetch artifacts if we have a successful run
+          // Find the latest SUCCESSFUL run (may be different from latestRun if build is in progress)
+          const latestSuccessfulRun = workflows.find(
+            (w: WorkflowRun) => w.status === 'completed' && w.conclusion === 'success'
+          ) || null
+
+          // Fetch artifacts from the latest successful run
           let apkArtifact: Artifact | null = null
-          if (latestRun && latestRun.status === 'completed' && latestRun.conclusion === 'success') {
+          if (latestSuccessfulRun) {
             try {
-              const artifactsUrl = `/api/artifacts/${latestRun.id}?owner=${owner}&repo=${repo}`
+              const artifactsUrl = `/api/artifacts/${latestSuccessfulRun.id}?owner=${owner}&repo=${repo}`
               const artifactsResponse = await fetch(artifactsUrl)
               const artifactsData = await artifactsResponse.json()
               const artifacts = artifactsData.artifacts || []
