@@ -2,6 +2,8 @@ export interface GitHubRepository {
   owner: string
   repo: string
   displayName: string
+  // Optional: Only show workflows with these IDs (most reliable filter)
+  allowedWorkflowIds?: number[]
   // Optional: Only show workflows matching these names (case-insensitive partial match)
   includedWorkflows?: string[]
   // Optional: Hide workflows matching these names (case-insensitive partial match)
@@ -13,8 +15,9 @@ export const REPOSITORIES: GitHubRepository[] = [
     owner: 'decentraland',
     repo: 'godot-explorer',
     displayName: 'Godot Explorer',
-    // Only show runner.yml workflow, exclude ios_build.yml
-    excludedWorkflows: ['ios build']
+    // Only show runner.yml workflow (workflow_id from GitHub Actions)
+    // To find workflow IDs: https://api.github.com/repos/decentraland/godot-explorer/actions/workflows
+    allowedWorkflowIds: [123491063]  // runner.yml (🔗 GHA)
   }
 ]
 

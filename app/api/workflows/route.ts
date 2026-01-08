@@ -6,16 +6,24 @@ function shouldExcludeWorkflow(
   owner: string,
   repo: string
 ): boolean {
+  const repoConfig = getRepositoryConfig(owner, repo)
+
+  // Priority 1: Filter by workflow ID (most reliable)
+  if (repoConfig?.allowedWorkflowIds && repoConfig.allowedWorkflowIds.length > 0) {
+    if (!repoConfig.allowedWorkflowIds.includes(workflow.workflow_id)) {
+      return true
+    }
+  }
+
   const lowerName = workflow.name.toLowerCase()
 
-  // Check global exclusions
+  // Priority 2: Check global exclusions by name
   const globalExcluded = EXCLUDED_WORKFLOWS.some(excluded =>
     lowerName.includes(excluded.toLowerCase())
   )
   if (globalExcluded) return true
 
-  // Check per-repo configuration
-  const repoConfig = getRepositoryConfig(owner, repo)
+  // Priority 3: Check per-repo name-based configuration
   if (repoConfig) {
     // If includedWorkflows is set, only include those
     if (repoConfig.includedWorkflows && repoConfig.includedWorkflows.length > 0) {
