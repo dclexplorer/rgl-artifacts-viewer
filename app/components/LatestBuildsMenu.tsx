@@ -82,7 +82,14 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
               const artifactsResponse = await fetch(artifactsUrl)
               const artifactsData = await artifactsResponse.json()
               const artifacts = artifactsData.artifacts || []
-              apkArtifact = artifacts.find((a: Artifact) => a.name === 'AndroidAPK') || null
+              // Find AndroidAPK artifact that is not expired
+              const apk = artifacts.find((a: Artifact) => a.name === 'AndroidAPK')
+              if (apk && apk.expires_at) {
+                const expiresAt = new Date(apk.expires_at)
+                if (expiresAt > new Date()) {
+                  apkArtifact = apk
+                }
+              }
             } catch (error) {
               console.error(`Error fetching artifacts for ${branch}:`, error)
             }
@@ -222,7 +229,7 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Download APK
+                    Download Latest APK
                     <span className="text-xs opacity-75">({formatFileSize(build.apkArtifact.size_in_bytes)})</span>
                   </>
                 )}
