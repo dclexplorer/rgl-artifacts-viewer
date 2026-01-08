@@ -130,7 +130,15 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
                         </>
                       )}
                       <span className="mx-2">•</span>
-                      <span>#{run.run_number}</span>
+                      <a
+                        href={`https://github.com/${owner}/${repo}/actions/runs/${run.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        #{run.run_number}
+                      </a>
                       <span className="mx-2">•</span>
                       <span>{run.event}</span>
                       <span className="mx-2">•</span>
