@@ -43,10 +43,14 @@ export default function PRSelector({
     }
   }
 
-  const displayValue = selectedPR 
-    ? `PR #${selectedPR.number}: ${selectedPR.title}` 
-    : selectedBranch 
-      ? selectedBranch === 'main' ? 'Main branch' : selectedBranch
+  const displayValue = selectedPR
+    ? `PR #${selectedPR.number}: ${selectedPR.title}`
+    : selectedBranch
+      ? selectedBranch === 'main'
+        ? 'Main branch'
+        : selectedBranch === 'release'
+          ? 'Release branch'
+          : selectedBranch
       : 'All workflow runs'
 
   return (
@@ -58,7 +62,11 @@ export default function PRSelector({
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`flex-1 min-w-0 px-3 py-2 border rounded-md flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 ${
-            selectedBranch === 'main' ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-700'
+            selectedBranch === 'main'
+              ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+              : selectedBranch === 'release'
+                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                : 'border-gray-300 dark:border-gray-700'
           }`}
         >
           <span className="flex items-center gap-2 min-w-0 flex-1">
@@ -66,6 +74,9 @@ export default function PRSelector({
             <span className="truncate">{displayValue}</span>
             {selectedBranch === 'main' && (
               <span className="text-xs bg-green-500 text-white px-2 py-1 rounded flex-shrink-0 ml-2">MAIN</span>
+            )}
+            {selectedBranch === 'release' && (
+              <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded flex-shrink-0 ml-2">RELEASE</span>
             )}
           </span>
           <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ml-2 ${isOpen ? 'rotate-180' : ''}`} />
@@ -97,6 +108,17 @@ export default function PRSelector({
               className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 font-medium"
             >
               All workflow runs
+            </button>
+            <button
+              onClick={() => {
+                onSelectPR(null)
+                onSelectBranch('release')
+                setIsOpen(false)
+              }}
+              className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between bg-purple-50 dark:bg-purple-900/20"
+            >
+              <span>Release branch</span>
+              <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">RELEASE</span>
             </button>
             <button
               onClick={() => {
