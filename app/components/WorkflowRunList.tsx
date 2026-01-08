@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { CheckCircle, XCircle, Clock, PlayCircle, AlertCircle, Download, GitPullRequest, ExternalLink } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, AlertCircle, Download, GitPullRequest, ExternalLink, Loader2 } from 'lucide-react'
 import type { WorkflowRun } from '@/lib/github'
 import ArtifactsList from './ArtifactsList'
 
@@ -48,8 +48,8 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
         default:
           return <AlertCircle className="w-5 h-5 text-yellow-500" />
       }
-    } else if (status === 'in_progress') {
-      return <PlayCircle className="w-5 h-5 text-blue-500 animate-pulse" />
+    } else if (status === 'in_progress' || status === 'queued' || status === 'pending') {
+      return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
     } else {
       return <Clock className="w-5 h-5 text-gray-500" />
     }
