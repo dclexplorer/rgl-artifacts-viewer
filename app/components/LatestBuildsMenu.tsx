@@ -69,16 +69,14 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
           const workflows: WorkflowRun[] = workflowData.workflows || []
           const latestRun = workflows.length > 0 ? workflows[0] : null
 
-          // Find the latest SUCCESSFUL run (may be different from latestRun if build is in progress)
-          const latestSuccessfulRun = workflows.find(
-            (w: WorkflowRun) => w.status === 'completed' && w.conclusion === 'success'
-          ) || null
-
-          // Fetch artifacts from the latest successful run
+          // Find the latest completed run that has AndroidAPK artifact
           let apkArtifact: Artifact | null = null
-          if (latestSuccessfulRun) {
+          const completedRuns = workflows.filter((w: WorkflowRun) => w.status === 'completed')
+
+          // Check each completed run for AndroidAPK artifact (most recent first)
+          for (const run of completedRuns) {
             try {
-              const artifactsUrl = `/api/artifacts/${latestSuccessfulRun.id}?owner=${owner}&repo=${repo}`
+              const artifactsUrl = `/api/artifacts/${run.id}?owner=${owner}&repo=${repo}`
               const artifactsResponse = await fetch(artifactsUrl)
               const artifactsData = await artifactsResponse.json()
               const artifacts = artifactsData.artifacts || []
@@ -88,10 +86,11 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
                 const expiresAt = new Date(apk.expires_at)
                 if (expiresAt > new Date()) {
                   apkArtifact = apk
+                  break // Found a valid APK, stop searching
                 }
               }
             } catch (error) {
-              console.error(`Error fetching artifacts for ${branch}:`, error)
+              console.error(`Error fetching artifacts for run ${run.id}:`, error)
             }
           }
 
