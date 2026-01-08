@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import { CheckCircle, XCircle, Clock, PlayCircle, AlertCircle, GitBranch, Rocket, Download } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, AlertCircle, GitBranch, Rocket, Download, Check, Loader2 } from 'lucide-react'
 import type { WorkflowRun, Artifact } from '@/lib/github'
 
 interface LatestBuildsMenuProps {
@@ -153,8 +153,8 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
         default:
           return <AlertCircle className="w-4 h-4 text-yellow-500" />
       }
-    } else if (status === 'in_progress') {
-      return <PlayCircle className="w-4 h-4 text-blue-500 animate-pulse" />
+    } else if (status === 'in_progress' || status === 'queued' || status === 'pending') {
+      return <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
     } else {
       return <Clock className="w-4 h-4 text-gray-500" />
     }
@@ -193,6 +193,11 @@ export default function LatestBuildsMenu({ owner, repo, onSelectBranch, selected
                   <GitBranch className={`w-5 h-5 ${build.color}`} />
                 )}
                 <span className={`font-semibold ${build.color}`}>{build.label}</span>
+                {build.apkArtifact && (
+                  <span className="flex items-center justify-center w-5 h-5 bg-green-500 rounded-full">
+                    <Check className="w-3 h-3 text-white" />
+                  </span>
+                )}
               </div>
 
               {build.loading ? (
