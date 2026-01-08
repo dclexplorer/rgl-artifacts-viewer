@@ -1,18 +1,32 @@
-interface GitHubRepository {
+export interface GitHubRepository {
   owner: string
   repo: string
   displayName: string
+  // Optional: Only show workflows matching these names (case-insensitive partial match)
+  includedWorkflows?: string[]
+  // Optional: Hide workflows matching these names (case-insensitive partial match)
+  excludedWorkflows?: string[]
 }
 
 export const REPOSITORIES: GitHubRepository[] = [
-  { owner: 'decentraland', repo: 'godot-explorer', displayName: 'Godot Explorer' },
-  { owner: 'decentraland', repo: 'bevy-explorer', displayName: 'Bevy Explorer' }
+  {
+    owner: 'decentraland',
+    repo: 'godot-explorer',
+    displayName: 'Godot Explorer',
+    // Only show runner.yml workflow, exclude ios_build.yml
+    excludedWorkflows: ['ios build']
+  }
 ]
 
-// Workflow names to exclude from the list (case-insensitive partial match)
+// Global workflow names to exclude from the list (case-insensitive partial match)
 export const EXCLUDED_WORKFLOWS = [
   'sync branch deletion'
 ]
+
+// Helper to get repository config
+export function getRepositoryConfig(owner: string, repo: string): GitHubRepository | undefined {
+  return REPOSITORIES.find(r => r.owner === owner && r.repo === repo)
+}
 
 export interface WorkflowRun {
   id: number

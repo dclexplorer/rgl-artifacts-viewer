@@ -2,35 +2,29 @@
 
 import { useState } from 'react'
 import { RefreshCw, GitBranch, Package, GitPullRequest } from 'lucide-react'
-import ProjectTabs from './components/ProjectTabs'
 import PRSelector from './components/PRSelector'
 import WorkflowRunList from './components/WorkflowRunList'
 import GitHubTokenWarning from './components/GitHubTokenWarning'
+import LatestBuildsMenu from './components/LatestBuildsMenu'
 import { REPOSITORIES } from '@/lib/github'
 import type { PullRequest } from '@/lib/github'
 
+// Single project configuration
+const PROJECT = REPOSITORIES[0]
+
 export default function Home() {
-  const [selectedProject, setSelectedProject] = useState({
-    owner: REPOSITORIES[0].owner,
-    repo: REPOSITORIES[0].repo
-  })
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
   const [selectedPR, setSelectedPR] = useState<PullRequest | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
-
-  const handleProjectChange = (owner: string, repo: string) => {
-    setSelectedProject({ owner, repo })
-    setSelectedBranch(null)
-    setSelectedPR(null)
-  }
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1)
   }
 
-  const currentRepo = REPOSITORIES.find(
-    r => r.owner === selectedProject.owner && r.repo === selectedProject.repo
-  )
+  const handleQuickBranchSelect = (branch: string) => {
+    setSelectedBranch(branch)
+    setSelectedPR(null)
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -58,27 +52,32 @@ export default function Home() {
         </header>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <ProjectTabs
-            selected={selectedProject}
-            onSelect={handleProjectChange}
-          />
-          <div className="mt-6">
-            <PRSelector
-              selectedPR={selectedPR}
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Quick Access</h3>
+            <LatestBuildsMenu
+              key={`${PROJECT.owner}-${PROJECT.repo}-${refreshKey}`}
+              owner={PROJECT.owner}
+              repo={PROJECT.repo}
+              onSelectBranch={handleQuickBranchSelect}
               selectedBranch={selectedBranch}
-              onSelectPR={setSelectedPR}
-              onSelectBranch={setSelectedBranch}
-              owner={selectedProject.owner}
-              repo={selectedProject.repo}
             />
           </div>
-          
+
+          <PRSelector
+            selectedPR={selectedPR}
+            selectedBranch={selectedBranch}
+            onSelectPR={setSelectedPR}
+            onSelectBranch={setSelectedBranch}
+            owner={PROJECT.owner}
+            repo={PROJECT.repo}
+          />
+
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="flex items-start gap-2">
               {selectedPR ? <GitPullRequest className="w-4 h-4 text-blue-500 mt-0.5" /> : <GitBranch className="w-4 h-4 text-blue-500 mt-0.5" />}
               <div className="text-sm">
                 <p className="text-blue-900 dark:text-blue-100">
-                  Currently viewing: <strong>{currentRepo?.displayName}</strong>
+                  Currently viewing: <strong>{PROJECT.displayName}</strong>
                   {selectedPR && (
                     <>
                       {' '}• PR #{selectedPR.number}: <strong>{selectedPR.title}</strong>
@@ -89,6 +88,9 @@ export default function Home() {
                       {' '}• Branch: <strong>{selectedBranch}</strong>
                       {selectedBranch === 'main' && (
                         <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded">MAIN</span>
+                      )}
+                      {selectedBranch === 'release' && (
+                        <span className="ml-2 text-xs bg-purple-500 text-white px-2 py-0.5 rounded">RELEASE</span>
                       )}
                     </>
                   )}
@@ -105,8 +107,8 @@ export default function Home() {
           </h2>
           <WorkflowRunList
             key={refreshKey}
-            owner={selectedProject.owner}
-            repo={selectedProject.repo}
+            owner={PROJECT.owner}
+            repo={PROJECT.repo}
             branch={selectedBranch}
           />
         </div>

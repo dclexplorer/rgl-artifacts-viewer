@@ -74,14 +74,17 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
     <div className="space-y-4">
       {runs.map((run) => {
         const isMain = run.head_branch === 'main'
+        const isRelease = run.head_branch === 'release'
         const isExpanded = expandedRun === run.id
         
         return (
           <div
             key={run.id}
             className={`border rounded-lg overflow-hidden ${
-              isMain 
-                ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10' 
+              isMain
+                ? 'border-green-500 bg-green-50/50 dark:bg-green-900/10'
+                : isRelease
+                ? 'border-purple-500 bg-purple-50/50 dark:bg-purple-900/10'
                 : 'border-gray-200 dark:border-gray-700'
             }`}
           >
@@ -97,6 +100,9 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
                       {run.display_title || run.name}
                       {isMain && (
                         <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">MAIN</span>
+                      )}
+                      {isRelease && (
+                        <span className="text-xs bg-purple-500 text-white px-2 py-1 rounded">RELEASE</span>
                       )}
                     </h3>
                     <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -152,7 +158,7 @@ export default function WorkflowRunList({ owner, repo, branch }: WorkflowRunList
             
             {isExpanded && (
               <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
-                <ArtifactsList owner={owner} repo={repo} runId={run.id} commitSha={run.head_sha} />
+                <ArtifactsList owner={owner} repo={repo} runId={run.id} />
               </div>
             )}
           </div>

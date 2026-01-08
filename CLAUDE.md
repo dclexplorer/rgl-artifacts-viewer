@@ -41,18 +41,19 @@ Routes follow Next.js 15 conventions with `Promise<params>` for dynamic routes.
 
 #### Component Architecture
 - **Client Components** (`'use client'`): All interactive UI components
-- **ProjectTabs**: Repository switcher using button tabs (not dropdown)
+- **LatestBuildsMenu**: Quick access buttons for release and main branches at top
 - **PRSelector**: Filters by open PRs or branches, includes "View PR" link
 - **WorkflowRunList**: Displays runs with embedded PR links
-- **ArtifactsList**: Shows artifacts with special handling for Bevy Explorer
+- **ArtifactsList**: Shows downloadable artifacts for workflow runs
 
 ### Special Behaviors
 
-#### Bevy Explorer Web Artifact
-When viewing Bevy Explorer builds, a special "Web" artifact is automatically added that:
-- Links to `https://bevy-web.kuruk.net/{commitSha}/index.html?systemScene=https://dclexplorer.github.io/bevy-ui-scene/BevyUiScene`
-- Shows even when no other artifacts exist
-- Uses green "Open Web" button instead of blue "Download"
+#### Quick Access Menu
+The top of the page shows quick access buttons for:
+- **Release branch**: Purple styling, shows latest release build status
+- **Main branch**: Green styling, shows latest main build status
+
+Clicking these buttons filters the workflow list to that branch.
 
 #### Authentication
 - GitHub token is **required** for artifact downloads (even from public repos - GitHub API limitation)
@@ -61,26 +62,35 @@ When viewing Bevy Explorer builds, a special "Web" artifact is automatically add
 
 ## Repository Configuration
 
-### Adding New Repositories
-Edit `/lib/github.ts`:
+Currently configured for **Godot Explorer** only. Edit `/lib/github.ts` to modify:
+
 ```typescript
 export const REPOSITORIES: GitHubRepository[] = [
-  { owner: 'decentraland', repo: 'godot-explorer', displayName: 'Godot Explorer' },
-  { owner: 'decentraland', repo: 'bevy-explorer', displayName: 'Bevy Explorer' },
-  // Add new repos here
+  {
+    owner: 'decentraland',
+    repo: 'godot-explorer',
+    displayName: 'Godot Explorer',
+    excludedWorkflows: ['ios build']  // Per-repo workflow filtering
+  }
 ]
 ```
 
 ### Filtering Workflows
-To hide certain workflows from the list (e.g., maintenance workflows like branch deletion), edit `/lib/github.ts`:
+
+#### Global Exclusions
+To hide certain workflows globally (e.g., maintenance workflows), edit `/lib/github.ts`:
 ```typescript
 export const EXCLUDED_WORKFLOWS = [
   'sync branch deletion',  // Case-insensitive partial match
-  // Add more patterns here (will match any workflow name containing these strings)
 ]
 ```
 
-The filter performs case-insensitive partial matching on workflow names. For example, `'sync branch deletion'` will match "🗑️ Sync Branch Deletion".
+#### Per-Repository Filtering
+Each repository can have its own workflow filters:
+- `excludedWorkflows`: Array of workflow name patterns to hide
+- `includedWorkflows`: Array of workflow name patterns to show (excludes all others)
+
+The filter performs case-insensitive partial matching on workflow names.
 
 ### Environment Variables
 - `GITHUB_TOKEN`: Personal Access Token (required for downloads)
@@ -99,7 +109,7 @@ All endpoints support caching headers and handle GitHub API rate limiting.
 
 ## UI/UX Conventions
 
-- **MAIN label**: Main branch is highlighted with green badge
+- **Branch badges**: Main branch (green MAIN badge), Release branch (purple RELEASE badge)
 - **PR filtering**: Shows only open PRs, includes draft indicator
 - **Workflow status icons**: Animated for in-progress builds
 - **Download behavior**: Opens in new tab to avoid CORS issues

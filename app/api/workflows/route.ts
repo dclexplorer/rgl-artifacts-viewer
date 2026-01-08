@@ -1,11 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchWorkflowRuns, EXCLUDED_WORKFLOWS } from '@/lib/github'
+import { fetchWorkflowRuns, EXCLUDED_WORKFLOWS, getRepositoryConfig, type WorkflowRun } from '@/lib/github'
 
-function shouldExcludeWorkflow(workflowName: string): boolean {
-  const lowerName = workflowName.toLowerCase()
-  return EXCLUDED_WORKFLOWS.some(excluded =>
+function shouldExcludeWorkflow(
+  workflow: WorkflowRun,
+  owner: string,
+  repo: string
+): boolean {
+  const lowerName = workflow.name.toLowerCase()
+
+  // Check global exclusions
+  const globalExcluded = EXCLUDED_WORKFLOWS.some(excluded =>
     lowerName.includes(excluded.toLowerCase())
   )
+  if (globalExcluded) return true
+
+  // Check per-repo configuration
+  const repoConfig = getRepositoryConfig(owner, repo)
+  if (repoConfig) {
+    // If includedWorkflows is set, only include those
+    if (repoConfig.includedWorkflows && repoConfig.includedWorkflows.length > 0) {
+      const isIncluded = repoConfig.includedWorkflows.some(included =>
+        lowerName.includes(included.toLowerCase())
+      )
+      if (!isIncluded) return true
+    }
+
+    // Check repo-specific exclusions
+    if (repoConfig.excludedWorkflows && repoConfig.excludedWorkflows.length > 0) {
+      const isExcluded = repoConfig.excludedWorkflows.some(excluded =>
+        lowerName.includes(excluded.toLowerCase())
+      )
+      if (isExcluded) return true
+    }
+  }
+
+  return false
 }
 
 export async function GET(request: NextRequest) {
@@ -20,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // Filter out excluded workflows
     const workflows = allWorkflows.filter(workflow =>
-      !shouldExcludeWorkflow(workflow.name)
+      !shouldExcludeWorkflow(workflow, owner, repo)
     )
 
     return NextResponse.json({ workflows }, {
